@@ -70,9 +70,9 @@ if __name__ == '__main__':
     # Lendo os dados de classificação dos filmes
     ratings_df = pd.read_csv("ml-25m/ratings.csv")
 
+    # Encontrando os filmes similares
     logging.info("Finding the similar movies")
-
-    movies_recommendations = find_similar_movies(movies_df, ratings_df, results.iloc[0]["title_clean"])
+    movies_recommendations = find_similar_movies(results.iloc[0]["title"], movies_df, ratings_df)
 
     # Exibe as recomendações
     if movies_recommendations.empty:
@@ -80,7 +80,10 @@ if __name__ == '__main__':
         print("Please, check if there are no spelling errors in the provided title.")
         print("If the error persists, change the movie title.")
     else:
-        print(f"Our 10 recommendations for you, based on the movie {movie_title}, are:")
+        print(f"\n\nOur 10 recommendations for you, based on the movie {movie_title}, are:\n")
+        i = 0
         for index, row in movies_recommendations.iterrows():
-            print(row["title"], row["genres"])
-            print("")
+            i += 1
+            title = row["title"]
+            genres = row["genres"]
+            print(f"{i}. {title} {genres}")

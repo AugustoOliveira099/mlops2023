@@ -52,7 +52,7 @@ def search_similar_movies_by_title(movies_df: pd.DataFrame,
     results = movies_df.iloc[indices].iloc[::-1]
     return results
 
-def find_similar_movies(clean_title: str,
+def find_similar_movies(movie_title: str,
                         movies_df: pd.DataFrame,
                         ratings_df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -60,7 +60,7 @@ def find_similar_movies(clean_title: str,
     com gostos similares e com usuários no geral
 
     Args:
-        clean_title (str): Título do filme que será analisado
+        movie_title (str): Título do filme que será analisado
         movies_df (pd.DataFrame): Dataframe contendo todos os filmes
         ratings_df (pd.DataFrame): Dataframe com a classificação de usuários para os filmes
 
@@ -68,17 +68,17 @@ def find_similar_movies(clean_title: str,
         rec_percentages (pd.DataFrame): Os 10 filmes recomendados
     """
     # Obtém o id do filme
-    movie_id = movies_df[movies_df["clean_title"] == clean_title]["movieId"].values[0]
+    movie_id = movies_df[movies_df["title"] == movie_title]["movieId"].values[0]
 
     # Encontra os usuários que deram uma nota maior que 4 para o filme informado
-    similar_users = ratings_df[(ratings_df["movieId"] == movie_id) and \
+    similar_users = ratings_df[(ratings_df["movieId"] == movie_id) & \
                                (ratings_df["rating"] > 4.5)]["userId"].unique()
 
     # Encontra as ids dos filmes cujas classiciações dos usuários "similar_users"
     # foram maior que 4.5 (os ids dos filmes podem se repetir). Ou seja, os filmes
     # que são recomendados para nós por aquele que também gostaram do mesmo filme
     # que a gente
-    similar_user_recs = ratings_df[(ratings_df["userId"].isin(similar_users)) and \
+    similar_user_recs = ratings_df[(ratings_df["userId"].isin(similar_users)) & \
                                    (ratings_df["rating"] > 4.5)]["movieId"]
 
     # Calcula a porcentagem das recomendações
@@ -108,10 +108,7 @@ def find_similar_movies(clean_title: str,
     # Ordena os scores em ordem descrescente
     rec_percentages = rec_percentages.sort_values("score", ascending=False)
 
-    # Retira o filme passado como parâmetro do dataframe, uma vez que não faz
-    # sentido indicar o filmes pelo qual a pessoa está procurando
-    rec_percentages = rec_percentages[rec_percentages.index != movie_id]
-
+    # Retorna os 10 filmes com melhor score
     return rec_percentages.head(10).merge(movies_df, \
                                           left_index=True, \
                                           right_on="movieId")[["score", "title", "genres"]]
