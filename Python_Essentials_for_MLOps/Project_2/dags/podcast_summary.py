@@ -1,14 +1,22 @@
-from airflow.decorators import dag, task
-from airflow.providers.sqlite.operators.sqlite import SQLExecuteQueryOperator
-from airflow.providers.sqlite.hooks.sqlite import SqliteHook
-import pendulum
-import xmltodict
-import requests
-import logging
+"""
+Pipeline que baixa episódios de podcast
+Autor: José Augusto
+Data: 2023-10-09
+"""
+
+# Import libraries
 import os
+import logging
+import pendulum
+import requests
+import xmltodict
+from airflow.decorators import dag, task
+from airflow.providers.sqlite.hooks.sqlite import SqliteHook
+from airflow.providers.sqlite.operators.sqlite import SQLExecuteQueryOperator
 
 PODCAST_URL = "https://www.marketplace.org/feed/podcast/marketplace/"
-EPISODE_FOLDER = "/home/augusto/Downloads/mlops2023/Python_Essentials_for_MLOps/Project_2/dags/episodes"
+USER_PATH = "/home/augusto/Downloads"
+EPISODE_FOLDER = USER_PATH + "/mlops2023/Python_Essentials_for_MLOps/Project_2/dags/episodes"
 FRAME_RATE = 16000
 
 # Configuração inicial do logging
@@ -21,7 +29,7 @@ def create_database() -> SQLExecuteQueryOperator:
     Cria a tabela episodes no banco de dados.
 
     Returns:
-        create_database (SQLExecuteQueryOperator): Um operador Airflow 
+        create_database (SQLExecuteQueryOperator): Um operador Airflow
             para criar a tabela no banco de dados.
     """
     return SQLExecuteQueryOperator(
@@ -39,18 +47,17 @@ def create_database() -> SQLExecuteQueryOperator:
         conn_id="podcast_summary"
     )
 
-@task()
-def get_episodes() -> list: 
+def get_episodes() -> list:
     """
     Faz o donwload dos metadados dos 50 últimos episódios.
 
     Return:
         episodes (list): Lista de dicionários contendo os 50 
-            últimos episódios.
+            últimos episódios lançados.
     """
     try:
         # Download dos dados
-        data = requests.get(PODCAST_URL)
+        data = requests.get(PODCAST_URL, timeout=20)
         # Parse de xml para dicionário
         feed = xmltodict.parse(data.text)
         # Obtém a lista de episódios
@@ -68,8 +75,17 @@ def get_episodes() -> list:
         logging.error("HTTP Error")
         raise
     except Exception as e:
-        logging.error("Error downloading podcast episodes: %s", str(e))
+        logging.error("Error downloading podcast episodes metadata: %s", str(e))
         raise
+
+@task()
+def get_episodes_task() -> list:
+    """
+    Task para requisitar os podcasts do endpoint
+    Return:
+        list: Lista de dicionários contendo os 50 últimos episódios lançados.
+    """
+    return get_episodes()
 
 @task()
 def load_episodes(episodes: list) -> None:
@@ -80,33 +96,58 @@ def load_episodes(episodes: list) -> None:
     Arg:
         episodes (list): Lista com os metadados dos episódios
     """
-    hook = SqliteHook(sqlite_conn_id="podcast_summary")
-    stored = hook.get_pandas_df("SELECT * from episodes;")
-    new_episodes = []
-    for episode in episodes:
-        if episode["link"] not in stored["link"].values:
-            filename = f"{episode['link'].split('/')[-1]}.mp3"
-            new_episodes.append([episode["link"], episode["title"], episode["pubDate"], episode["description"], filename])
-    hook.insert_rows(table="episodes", rows=new_episodes, target_fields=["link", "title", "published", "description", "filename"])
+    try:
+        hook = SqliteHook(sqlite_conn_id="podcast_summary")
+        stored = hook.get_pandas_df("SELECT * from episodes;")
+        new_episodes = []
+        for episode in episodes:
+            if episode["link"] not in stored["link"].values:
+                logging.info("Storing episode %s on database", episode["link"])
+                filename = f"{episode['link'].split('/')[-1]}.mp3"
+                new_episodes.append([episode["link"],
+                                    episode["title"],
+                                    episode["pubDate"],
+                                    episode["description"],
+                                    filename])
+        hook.insert_rows(table="episodes", rows=new_episodes, target_fields=["link",
+                                                                            "title",
+                                                                            "published",
+                                                                            "description",
+                                                                            "filename"])
+    except Exception as e:
+        logging.error("Error loading episodes into the database: %s", str(e))
+        raise
 
 @task()
 def download_episodes(episodes: list) -> None:
     """
-    Faz o download dos arquivos de audio dos episódios no
-    formato .mp3
+    Faz o download dos arquivos de audio no formato .mp3 dos episódios 
+    que ainda não foram baixados
 
     Arg:
         episodes (list): Lista com os metadados dos episódios
     """
-    for episode in episodes:
-        filename = f"{episode['link'].split('/')[-1]}.mp3"
-        audio_path = os.path.join(EPISODE_FOLDER, filename)
-        if not os.path.exists(audio_path):
-            logging.info("Downloading %s", filename)
-            audio = requests.get(episode["enclosure"]["@url"])
-            with open(audio_path, "wb+") as f:
-                f.write(audio.content)
-
+    try:
+        for episode in episodes:
+            filename = f"{episode['link'].split('/')[-1]}.mp3"
+            audio_path = os.path.join(EPISODE_FOLDER, filename)
+            if not os.path.exists(audio_path):
+                logging.info("Downloading %s", filename)
+                audio = requests.get(episode["enclosure"]["@url"], timeout=300)
+                with open(audio_path, "wb+") as f:
+                    f.write(audio.content)
+    except requests.exceptions.ConnectionError:
+        logging.error("Connection Error")
+        raise
+    except requests.exceptions.HTTPError:
+        logging.error("HTTP Error")
+        raise
+    except IOError as e:
+        logging.error("Error writing podcast episode to disk: %s", str(e))
+        raise
+    except Exception as e:
+        logging.error("Error downloading podcast episodes in .mp3: %s", str(e))
+        raise
 
 @dag(
     dag_id='podcast_summary',
@@ -124,8 +165,8 @@ def podcast_summary():
     database = create_database()
 
     # Faz o download dos episódios
-    logging.info("Downloading episodes")
-    podcast_episodes = get_episodes()
+    logging.info("Downloading episodes metadata")
+    podcast_episodes = get_episodes_task()
 
     # Especifica que primeiro deve ser criado o banco de dados e
     # depois feito o donwload dos episódios
@@ -137,4 +178,4 @@ def podcast_summary():
     # Faz o download dos arquivos de audio
     download_episodes(podcast_episodes)
 
-summary = podcast_summary()
+podcast_summary()
