@@ -33,7 +33,7 @@ def clean_movie_title(title: str) -> str:
     clean_title = re.sub(r"[^a-zA-Z0-9\s]", "", title)
     return clean_title
 
-def search_similar_movies_by_title(movies_df: pd.DataFrame, 
+def search_similar_movies_by_title(movies_df: pd.DataFrame,
                           vectorizer: TfidfVectorizer,
                           title: str) -> pd.DataFrame:
     """
@@ -46,7 +46,7 @@ def search_similar_movies_by_title(movies_df: pd.DataFrame,
     """
     clean_title = clean_movie_title(title)
     query_vec = vectorizer.transform([clean_title])
-    similarity = cosine_similarity(query_vec, 
+    similarity = cosine_similarity(query_vec,
                                    vectorizer.fit_transform(movies_df["clean_title"])).flatten()
     indices = np.argpartition(similarity, -5)[-5:]
     results = movies_df.iloc[indices].iloc[::-1]

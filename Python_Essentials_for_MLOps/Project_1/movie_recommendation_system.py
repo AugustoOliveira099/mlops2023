@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     # Iniciando o parse para receber o título do filme como parâmetro
     parser = argparse.ArgumentParser(description="Movie Recommendation System")
-    parser.add_argument("-title", type=str, help="The title of the movie")
+    parser.add_argument("--title", type=str, help="The title of the movie")
     args = parser.parse_args()
 
     # get the movie title
@@ -87,3 +87,4 @@ if __name__ == '__main__':
             title = row["title"]
             genres = row["genres"]
             print(f"{i}. {title} {genres}")
+            
