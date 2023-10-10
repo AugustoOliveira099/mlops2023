@@ -1,1 +1,5 @@
 airflow/
+sqlite-snapshot-202309111527/
+dags/__pycache__
+dags/episodes.db
+dags/episodes
