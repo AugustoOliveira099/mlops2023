@@ -96,7 +96,12 @@ Agora, cheque a conexão do airflow com o seu banco de dados:
 airflow connections get podcast_summary
 ```
 
-Agora, pare a execução da aplicação do airflow e a execute novamente para aplicar as mudanças feitas:
+Mude a variável ``USER_PATH``, dentro do arquivo ``dags/podcast_summary.py`` para que contenha o caminho da sua máquina até o diretório que está contendo a pasta ``mlops2023/``. No meu caso:
+```
+USER_PATH = "/home/augusto/Downloads"
+```
+
+Agora, pare a execução do airflow e a execute novamente para aplicar as mudanças feitas:
 ```
 airflow standalone
 ```
@@ -107,7 +112,7 @@ Na página inicial, em que há uma lista com as DAGs, procure pela opção "podc
 
 A última task foi interrompida, uma vez que não quero os 50 episódios de podcast, mas alguns foram baixados para testar a eficiência da pipeline.
 
-## O código
+## Explicando o código
 A pipeline é criado a partir do decorador @dag(), que está sendo configurada ter o nome de "podcast_summary", ser executada diariamente, ter uma data de incício no dia 08/10/2023 e não ser executado retroativamente, ou seja, ele indica que o DAG não deve executar tarefas retroativamente para as datas em que o DAG deveria ter sido executado, mas não foi devido a atrasos ou falta de execução.
 ```
 @dag(
@@ -125,7 +130,7 @@ def podcast_summary():
     logging.info("Creating the table, if it don't exists")
     database = create_database()
 
-    # Faz o download dos episódios
+    # Faz o fetch dos metadados dos episódios
     logging.info("Downloading episodes metadata")
     podcast_episodes = get_episodes_task()
 
@@ -141,3 +146,150 @@ def podcast_summary():
 
 podcast_summary()
 ```
+A pipeline é responsável por chamar as tasks. Primeiro é criado o banco de dados, depois é feito o download dos metadados nos episódios, em seguida esses metadados são armazenados no banco de dados e, por fim, faz o download dos episódios em .mp3.
+
+Abaixo está o código responsável por criar o banco de dados relacional. Esse banco de dados possuirá apenas a tabela ``episodes``, com as colunas "link", como chave primária, "title", "filaname", "published" e "description".
+```
+def create_database() -> SQLExecuteQueryOperator:
+    """
+    Cria a tabela episodes no banco de dados.
+
+    Returns:
+        create_database (SQLExecuteQueryOperator): Um operador Airflow
+            para criar a tabela no banco de dados.
+    """
+    return SQLExecuteQueryOperator(
+        task_id='create_table_sqlite',
+        sql=r"""
+        CREATE TABLE IF NOT EXISTS episodes (
+            link TEXT PRIMARY KEY,
+            title TEXT,
+            filename TEXT,
+            published TEXT,
+            description TEXT
+        );
+        """,
+        conn_id="podcast_summary"
+    )
+```
+
+A seguir está e a função responsável por fazer a requisição dos metadados dos 50 últimos episódios lançados e sua task. Essa função possui uma task responsável por chamá-la pois para executar o teste para a requisição dos metadados é preciso da função sem o decorador @task().
+```
+def get_episodes() -> list:
+    """
+    Faz a requisição dos metadados dos 50 últimos episódios.
+
+    Return:
+        episodes (list): Lista de dicionários contendo os 50 
+            últimos episódios lançados.
+    """
+    try:
+        # Requisição dos dados
+        data = requests.get(PODCAST_URL, timeout=20)
+        # Parse de xml para dicionário
+        feed = xmltodict.parse(data.text)
+        # Obtém a lista de episódios
+        episodes = feed["rss"]["channel"]["item"]
+        # Mostra a quantidade de episódios encontrados
+        logging.info("Found %s episodes.", len(episodes))
+        return episodes
+    except requests.exceptions.ConnectionError:
+        logging.error("Connection Error")
+        raise
+    except requests.exceptions.Timeout:
+        logging.error("Timeout Error")
+        raise
+    except requests.exceptions.HTTPError:
+        logging.error("HTTP Error")
+        raise
+    except Exception as e:
+        logging.error("Error downloading podcast episodes metadata: %s", str(e))
+        raise
+
+@task()
+def get_episodes_task() -> list:
+    """
+    Task para requisitar os podcasts do endpoint
+    Return:
+        list: Lista de dicionários contendo os 50 últimos episódios lançados.
+    """
+    return get_episodes()
+```
+Na função get_episodes é feita uma requisição HTTP do tipo GET e os metadados dos 50 últimos episódios, no formato xml, são capturados. Depois disso, são extraídos esses dados para uma lista.
+
+Adiante está a task responsável por inserir os dados referentes aos episódios na tabela SQL.
+```
+@task()
+def load_episodes(episodes: list) -> None:
+    """
+    Insere no banco de dados os novos episódios baixados e
+    impedindo que eles se repitam
+
+    Arg:
+        episodes (list): Lista com os metadados dos episódios
+    """
+    try:
+        hook = SqliteHook(sqlite_conn_id="podcast_summary")
+        stored = hook.get_pandas_df("SELECT * from episodes;")
+        new_episodes = []
+        for episode in episodes:
+            if episode["link"] not in stored["link"].values:
+                logging.info("Storing episode %s on database", episode["link"])
+                filename = f"{episode['link'].split('/')[-1]}.mp3"
+                new_episodes.append([episode["link"],
+                                    episode["title"],
+                                    episode["pubDate"],
+                                    episode["description"],
+                                    filename])
+        hook.insert_rows(table="episodes", rows=new_episodes, target_fields=["link",
+                                                                            "title",
+                                                                            "published",
+                                                                            "description",
+                                                                            "filename"])
+    except Exception as e:
+        logging.error("Error loading episodes into the database: %s", str(e))
+        raise
+```
+No código acima, é possível notar que os episódios só serão inseridos se eles não estiverem na tabela.
+
+Abaixo está a task que faz o download, de fato dos arquivos no formato .mp3.
+```
+@task()
+def download_episodes(episodes: list) -> None:
+    """
+    Faz o download dos arquivos de áudio no formato .mp3 dos episódios 
+    que ainda não foram baixados
+
+    Arg:
+        episodes (list): Lista com os metadados dos episódios
+    """
+    try:
+        for episode in episodes:
+            filename = f"{episode['link'].split('/')[-1]}.mp3"
+            audio_path = os.path.join(EPISODE_FOLDER, filename)
+            if not os.path.exists(audio_path):
+                logging.info("Downloading %s", filename)
+                audio = requests.get(episode["enclosure"]["@url"], timeout=300)
+                with open(audio_path, "wb+") as f:
+                    f.write(audio.content)
+    except requests.exceptions.ConnectionError:
+        logging.error("Connection Error")
+        raise
+    except requests.exceptions.HTTPError:
+        logging.error("HTTP Error")
+        raise
+    except IOError as e:
+        logging.error("Error writing podcast episode to disk: %s", str(e))
+        raise
+    except Exception as e:
+        logging.error("Error downloading podcast episodes in .mp3: %s", str(e))
+        raise
+```
+O nome do arquivo é definido, assim como o seu caminho. No caso do caminho já existir no nosso sistema, significa que o áudio já foi baixado, caso contrário, é preciso baixá-lo. Ao fazer isso, o arquivo é salvo na pasta episodes.
+
+
+
+
+
+
+
