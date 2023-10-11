@@ -17,12 +17,10 @@ from airflow.providers.sqlite.operators.sqlite import SQLExecuteQueryOperator
 PODCAST_URL = "https://www.marketplace.org/feed/podcast/marketplace/"
 USER_PATH = "/home/augusto/Downloads"
 EPISODE_FOLDER = USER_PATH + "/mlops2023/Python_Essentials_for_MLOps/Project_2/dags/episodes"
-FRAME_RATE = 16000
 
 # Configuração inicial do logging
 # Com level logging.INFO, também é englobado o level logging.ERROR
 logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
-
 
 def create_database() -> SQLExecuteQueryOperator:
     """
@@ -40,8 +38,7 @@ def create_database() -> SQLExecuteQueryOperator:
             title TEXT,
             filename TEXT,
             published TEXT,
-            description TEXT,
-            transcript TEXT
+            description TEXT
         );
         """,
         conn_id="podcast_summary"
@@ -49,20 +46,20 @@ def create_database() -> SQLExecuteQueryOperator:
 
 def get_episodes() -> list:
     """
-    Faz o donwload dos metadados dos 50 últimos episódios.
+    Faz a requisição dos metadados dos 50 últimos episódios.
 
     Return:
         episodes (list): Lista de dicionários contendo os 50 
             últimos episódios lançados.
     """
     try:
-        # Download dos dados
+        # Requisição dos dados
         data = requests.get(PODCAST_URL, timeout=20)
         # Parse de xml para dicionário
         feed = xmltodict.parse(data.text)
         # Obtém a lista de episódios
         episodes = feed["rss"]["channel"]["item"]
-        # Mostra a quantidade de episódios que foram feitos o download
+        # Mostra a quantidade de episódios encontrados
         logging.info("Found %s episodes.", len(episodes))
         return episodes
     except requests.exceptions.ConnectionError:
@@ -121,7 +118,7 @@ def load_episodes(episodes: list) -> None:
 @task()
 def download_episodes(episodes: list) -> None:
     """
-    Faz o download dos arquivos de audio no formato .mp3 dos episódios 
+    Faz o download dos arquivos de áudio no formato .mp3 dos episódios 
     que ainda não foram baixados
 
     Arg:
@@ -164,7 +161,7 @@ def podcast_summary():
     logging.info("Creating the table, if it don't exists")
     database = create_database()
 
-    # Faz o download dos episódios
+    # Faz o fetch dos metadados dos episódios
     logging.info("Downloading episodes metadata")
     podcast_episodes = get_episodes_task()
 

@@ -32,4 +32,3 @@ def test_get_episodes(get_episodes_fixture) -> None:
 
     assert isinstance(episodes, list)
     assert len(episodes) == 50
-    
