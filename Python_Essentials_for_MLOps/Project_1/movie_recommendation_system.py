@@ -2,8 +2,11 @@
 De um modo geral, este script indica 10 filmes baseados
 no nome de um filme passado como parâmetro e na classificação
 dos filmes pelos usuários
+Autor: José Augusto
+Data: 2023-10-09
 """
-# import libraries
+
+# Importa bibliotecas
 import os
 import zipfile
 import argparse
@@ -11,11 +14,13 @@ import logging
 import requests
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
-
 from functions import clean_movie_title, \
                       search_similar_movies_by_title, \
                       find_similar_movies, \
                       download_zip_file
+
+# Nome do diretório contendo os dataframes baixados
+DIRECTORY_NAME = "ml-25m/"
 
 # Verifica se o script está sendo executado como programa principal
 if __name__ == '__main__':
@@ -25,7 +30,7 @@ if __name__ == '__main__':
 
     # Iniciando o parse para receber o título do filme como parâmetro
     parser = argparse.ArgumentParser(description="Movie Recommendation System")
-    parser.add_argument("--title", type=str, help="The title of the movie")
+    parser.add_argument("-t", "--title", type=str, help="The title of the movie")
     args = parser.parse_args()
 
     # get the movie title
@@ -33,7 +38,7 @@ if __name__ == '__main__':
 
     # read the data
     try:
-        if not os.path.exists("ml-25m"):
+        if not os.path.exists(DIRECTORY_NAME):
             logging.info("Downloading the zip file")
 
             download_zip_file()
@@ -61,16 +66,18 @@ if __name__ == '__main__':
     tfidf_vectorizer = TfidfVectorizer(ngram_range=(1,2))
 
     # Ajustando e transformando os dados com base na instância TF-IDF
-    logging.info("Ajustando e transformando os dados")
+    logging.info("Adjusting and transforming the data")
     tfidf_matrix = tfidf_vectorizer.fit_transform(movies_df["clean_title"])
 
     # Obtém os 5 filmes mais similares a partir do título
     results = search_similar_movies_by_title(movies_df, tfidf_vectorizer, movie_title)
 
+    logging.info("Reading the ratings dataframe")
     # Lendo os dados de classificação dos filmes
     ratings_df = pd.read_csv("ml-25m/ratings.csv")
 
     # Encontrando os filmes similares
+    print("")
     logging.info("Finding the similar movies")
     movies_recommendations = find_similar_movies(results.iloc[0]["title"], movies_df, ratings_df)
 
@@ -80,7 +87,7 @@ if __name__ == '__main__':
         print("Please, check if there are no spelling errors in the provided title.")
         print("If the error persists, change the movie title.")
     else:
-        print(f"\n\nOur 10 recommendations for you, based on the movie {movie_title}, are:\n")
+        print(f"\nOur 10 recommendations for you, based on the movie {movie_title}, are:\n")
         i = 0
         for index, row in movies_recommendations.iterrows():
             i += 1

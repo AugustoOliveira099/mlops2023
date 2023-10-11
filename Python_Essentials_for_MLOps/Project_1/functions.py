@@ -1,6 +1,8 @@
 """"
 Script destinado às funções que serão utilizadas na
 main: ./movie_recommendation_system.py.
+Autor: José Augusto
+Data: 2023-10-09
 """
 
 # Importa bibliotecas
@@ -14,6 +16,11 @@ import pandas as pd
 import tqdm
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+
+# URL do arquivo que será feito o download
+ENDPOINT = "http://files.grouplens.org/datasets/movielens/ml-25m.zip"
+# Nome do arquivo zip a ser baixado
+ZIP_FILENAME = "ml-25m.zip"
 
 # Configuração inicial do logging
 # Com level logging.INFO, também é englobado o level logging.ERROR
@@ -117,32 +124,27 @@ def download_zip_file() -> None:
     """
     Faz download dos arquivos necessários para que o script funcione corretamente
     """
-    # URL do arquivo
-    url="http://files.grouplens.org/datasets/movielens/ml-25m.zip"
-
-    # Nome do arquivo zip a ser baixado
-    zip_filename = "ml-25m.zip"
 
     with requests.Session() as session:
-        response = session.get(url, stream=True)
+        response = session.get(ENDPOINT, stream=True)
         total_size = int(response.headers.get('content-length', 0))
 
         # Definindo o chunk size
         chunk_size = 128 * 1024
 
         # Download do arquivo
-        with open(zip_filename, 'wb') as file:
+        with open(ZIP_FILENAME, 'wb') as file:
             for data in tqdm.tqdm(response.iter_content(chunk_size=chunk_size),
                             total=total_size // chunk_size,
                             unit='KB',
-                            desc=zip_filename,
+                            desc=ZIP_FILENAME,
                             leave=True):
                 file.write(data)
 
     # Descompacta os arquivos
     logging.info("Unzipping the file")
-    with zipfile.ZipFile(zip_filename, 'r') as zip_ref:
+    with zipfile.ZipFile(ZIP_FILENAME, 'r') as zip_ref:
         zip_ref.extractall(".")
 
     # Remove o arquivo ZIP
-    os.remove(zip_filename)
+    os.remove(ZIP_FILENAME)
