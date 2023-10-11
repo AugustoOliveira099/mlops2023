@@ -101,5 +101,43 @@ Agora, pare a execução da aplicação do airflow e a execute novamente para ap
 airflow standalone
 ```
 
-Na página inicial, em que há uma lista com as DAGs, procure pela opção "podcast_summary" e despause essa DAG clicando no toggle ao lado de seu título. Em seguida, clique no título e você obterá mais informações sobre ela, como grafos e logs sobre cada task da pipeline.
+Na página inicial, em que há uma lista com as DAGs, procure pela opção "podcast_summary" e despause essa DAG clicando no toggle ao lado de seu título. Em seguida, clique no título e você obterá mais informações sobre ela, como grafos e logs sobre cada task da pipeline. Para executar a pipeline, basta clicar no ícone de "play" na parte superior direita.
 
+![fwefgr](images/airflow.png)
+
+A última task foi interrompida, uma vez que não quero os 50 episódios de podcast, mas alguns foram baixados para testar a eficiência da pipeline.
+
+## O código
+A pipeline é criado a partir do decorador @dag(), que está sendo configurada ter o nome de "podcast_summary", ser executada diariamente, ter uma data de incício no dia 08/10/2023 e não ser executado retroativamente, ou seja, ele indica que o DAG não deve executar tarefas retroativamente para as datas em que o DAG deveria ter sido executado, mas não foi devido a atrasos ou falta de execução.
+```
+@dag(
+    dag_id='podcast_summary',
+    schedule_interval="@daily",
+    start_date=pendulum.datetime(2023, 10, 8),
+    catchup=False
+)
+def podcast_summary():
+    """
+    Cria a pipeline de dados com o decorador @dag
+    """
+
+    # Cria o banco de dados
+    logging.info("Creating the table, if it don't exists")
+    database = create_database()
+
+    # Faz o download dos episódios
+    logging.info("Downloading episodes metadata")
+    podcast_episodes = get_episodes_task()
+
+    # Especifica que primeiro deve ser criado o banco de dados e
+    # depois feito o donwload dos episódios
+    database.set_downstream(podcast_episodes)
+
+    # Armazena os novos episódios baixados
+    load_episodes(podcast_episodes)
+
+    # Faz o download dos arquivos de audio
+    download_episodes(podcast_episodes)
+
+podcast_summary()
+```
