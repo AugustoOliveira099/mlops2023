@@ -285,11 +285,55 @@ def download_episodes(episodes: list) -> None:
         logging.error("Error downloading podcast episodes in .mp3: %s", str(e))
         raise
 ```
-O nome do arquivo é definido, assim como o seu caminho. No caso do caminho já existir no nosso sistema, significa que o áudio já foi baixado, caso contrário, é preciso baixá-lo. Ao fazer isso, o arquivo é salvo na pasta episodes.
+No código, o nome do arquivo é definido, assim como o seu caminho, que junta o caminho da pasta ``episodes`` com o nome do arquivo. No caso do caminho já existir no seu computador, significa que o áudio já foi baixado, caso contrário, é preciso baixá-lo. Ao fazer isso, o arquivo é salvo na pasta episodes.
 
+## Testes
+Para garantir que tudo está funcionando bem, é crucial a existência de testes. Sendo assim, foram criados dois testes para garantir que as funções da pipeline estão sendo executadas como devem.
+* O primeiro testa se o banco de dados está sendo criado como deve, verificando a instância do dado retornado;
+* O segundo teste verifica se a função ``get_episodes`` está realmente retornando uma lista, e se essa lista possui tamanho 50. A lista sempre deve possuir tamanho 50 por conter justamente o tamanho dos últimos 50 episódios lançados, o que sempre acontecerá, já que o [marketplace](https://www.marketplace.org/) é uma organização consolidada no mercado.
 
+Os testes serão feitos executando o comando abaixo na pasta ``Projeto_2``:
+```
+pytest
+```
 
+Caso prefiro, é possível executar seguinte comando, na mesma pasta:
+```	
+pytest test_dag.py
+```
 
+Para realizar os testes, o arquivo ``test_dag.py``, contendo as funções assertivas, utiliza as fixtures presentes no arquivo ``conftest.py``.
 
+A seguir estão os testes sendo executados e possuindo assertividade de 100%:
+![pytest](images/pytest.png)
 
+## Pylint
+Para manter código limpo, organizado e de fácil manutenção, foi utilizado o ``pylint`` para seguir um padrão pré estabelecido.
 
+O pylint dá uma nota de 0 a 10 para um código python, caso a nota seja menor que 10, ele indica o que precisa ser corrigido para que a nota aumente.
+
+Para fazer uso do pylint, basta usar o comando abaixo, substituindo ``file_name`` pelo nome do seu arquivo python:
+```
+pylint {file_name}.py
+```
+
+No meu caso, foram utilizados alguns comandos. Para o arquivo ``conftest.py``, por exemplo:
+```
+pylint conftest.py
+```
+
+Para o arquivo ``test_dag.py``:
+```
+pylint test_dag.py
+```
+
+Para o arquivo ``podcast_summary.py``:
+```
+pylint podcast_summary.py
+```
+
+A seguir estão as saídas para os comandos citados:
+![pylint](images/pylint.png)
+
+## Copyrights ©
+Esse código foi adaptado para fins educacionais a partir do [código fonte](https://github.com/dataquestio/project-walkthroughs/blob/master/podcast_summary/podcast_summary.py) acessível no GitHub. Também existe uma [vídeo aula](https://www.youtube.com/watch?v=s-r2gEr7YW4&ab_channel=Dataquest) no YouTube feita pelo autor do código explicando o passo a passo de como é feito. Esse é um projeto do [Dataquest](https://www.dataquest.io/).
