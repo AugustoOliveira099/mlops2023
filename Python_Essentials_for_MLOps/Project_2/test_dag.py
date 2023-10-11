@@ -4,6 +4,7 @@ Autor: José Augusto
 Data: 2023-10-09
 """
 
+# Importa bibliotecas
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 
 def test_create_database(create_database_fixture) -> None:

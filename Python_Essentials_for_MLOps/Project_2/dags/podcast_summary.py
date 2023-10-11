@@ -4,7 +4,7 @@ Autor: José Augusto
 Data: 2023-10-09
 """
 
-# Import libraries
+# Importa bibliotecas
 import os
 import logging
 import pendulum

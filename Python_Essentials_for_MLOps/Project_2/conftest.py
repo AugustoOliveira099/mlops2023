@@ -4,6 +4,7 @@ Autor: José Augusto
 Data: 2023-10-09
 """
 
+# Importa bibliotecas
 import pytest
 from dags.podcast_summary import get_episodes
 from dags.podcast_summary import create_database
