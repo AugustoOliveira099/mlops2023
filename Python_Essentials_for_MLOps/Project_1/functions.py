@@ -88,6 +88,7 @@ def find_similar_movies(movie_title: str,
                                    (ratings_df["rating"] > 4.5)]["movieId"]
 
     # Calcula a porcentagem das recomendações
+    # (Número de vezes que o filme foi recomendado) / (qtd. de similar_users)
     similar_user_recs = similar_user_recs.value_counts() / len(similar_users)
 
     # Filtra as recomendações de filmes para que apenas aquelas que tiveram
@@ -100,6 +101,8 @@ def find_similar_movies(movie_title: str,
 
     # Porcentagem de usuários que classificaram os filmes recomendados com uma
     # nota maior que 4.5
+    # (Número de vezes que o filme também foi recomendado por usuários no geral)/ 
+    # (qtd. de all_users)
     all_users_recs = all_users["movieId"].value_counts() / len(all_users["userId"].unique())
 
     # Junta as duas séries em um dataframe
