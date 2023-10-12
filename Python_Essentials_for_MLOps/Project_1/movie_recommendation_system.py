@@ -67,7 +67,7 @@ if __name__ == '__main__':
 
     # Ajustando e transformando os dados com base na instância TF-IDF
     logging.info("Adjusting and transforming the data")
-    tfidf_matrix = tfidf_vectorizer.fit_transform(movies_df["clean_title"])
+    tfidf_vectorizer.fit_transform(movies_df["clean_title"])
 
     # Obtém os 5 filmes mais similares a partir do título
     results = search_similar_movies_by_title(movies_df, tfidf_vectorizer, movie_title)
