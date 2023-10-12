@@ -83,8 +83,7 @@ def find_similar_movies(movie_title: str,
 
     # Encontra as ids dos filmes cujas classiciações dos usuários "similar_users"
     # foram maior que 4.5 (os ids dos filmes podem se repetir). Ou seja, os filmes
-    # que são recomendados para nós por aquele que também gostaram do mesmo filme
-    # que a gente
+    # que são recomendados por aqueles que também gostaram do mesmo filme que nós
     similar_user_recs = ratings_df[(ratings_df["userId"].isin(similar_users)) & \
                                    (ratings_df["rating"] > 4.5)]["movieId"]
 
@@ -99,8 +98,8 @@ def find_similar_movies(movie_title: str,
     all_users = ratings_df[(ratings_df["movieId"].isin(similar_user_recs.index)) & \
                            (ratings_df["rating"] > 4.5)]
 
-    # Porcentagem de usuários que também classificaram os filmes recomendados
-    # com uma nota maior que 4.5
+    # Porcentagem de usuários que classificaram os filmes recomendados com uma
+    # nota maior que 4.5
     all_users_recs = all_users["movieId"].value_counts() / len(all_users["userId"].unique())
 
     # Junta as duas séries em um dataframe
