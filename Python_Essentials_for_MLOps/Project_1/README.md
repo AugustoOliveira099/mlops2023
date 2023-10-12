@@ -1,1 +1,10 @@
-# Project 1
+# Movie Recommendation System
+## Introdução
+
+## Código
+
+## Boas práticas
+
+## Testes
+
+## Copyright ©
