@@ -108,7 +108,7 @@ airflow standalone
 
 Na página inicial, em que há uma lista com as DAGs, procure pela opção "podcast_summary" e despause essa DAG clicando no toggle ao lado de seu título. Em seguida, clique no título e você obterá mais informações sobre ela, como grafos e logs sobre cada task da pipeline. Para executar a pipeline, basta clicar no ícone de "play" na parte superior direita.
 
-![fwefgr](images/airflow.png)
+![Painel da DAG podcast_summary no airflow](images/airflow.png)
 
 A última task foi interrompida, uma vez que não quero os 50 episódios de podcast, mas alguns foram baixados para testar a eficiência da pipeline.
 
@@ -305,7 +305,7 @@ pytest test_dag.py
 Para realizar os testes, o arquivo ``test_dag.py``, contendo as funções assertivas, utiliza as fixtures presentes no arquivo ``conftest.py``.
 
 A seguir estão os testes sendo executados e possuindo assertividade de 100%:
-![pytest](images/pytest.png)
+![Execução e resultado do comando pytest](images/pytest.png)
 
 ## Pylint
 Para manter código limpo, organizado e de fácil manutenção, foi utilizado o ``pylint`` para seguir um padrão pré estabelecido.
@@ -333,7 +333,7 @@ pylint podcast_summary.py
 ```
 
 A seguir estão as saídas para os comandos citados:
-![pylint](images/pylint.png)
+![Execução e resultado ao utilizar o comando pylint nos arquivos](images/pylint.png)
 
 ## Copyrights ©
 Esse código foi adaptado para fins educacionais a partir do [código fonte](https://github.com/dataquestio/project-walkthroughs/blob/master/podcast_summary/podcast_summary.py) acessível no GitHub. Também existe uma [vídeo aula](https://www.youtube.com/watch?v=s-r2gEr7YW4&ab_channel=Dataquest) no YouTube feita pelo autor do código explicando o passo a passo de como é feito. Esse é um projeto do [Dataquest](https://www.dataquest.io/).
