@@ -103,7 +103,7 @@ else:
 ```
 
 ## Boas práticas
-Para manter uma legibilidade no código, ser de fácil interpretação e possuir uma manutenção rápida, boas práticas são cruciais. Nesse sentido, foi utilizado o pylint, que analisa e dá uma nota de 0 a 10 para o código, verificando se segue as diretrizes definidas no PEP 8 (Python Enhancement Proposal 8), que é o guia de estilo para código Python.
+Para manter uma legibilidade no código, ser de fácil interpretação e possuir uma manutenção rápida, boas práticas são cruciais. Nesse sentido, foi utilizado a biblioteca ``pylint``, que analisa e dá uma nota de 0 a 10 para o código, verificando se segue as diretrizes definidas no PEP 8 (Python Enhancement Proposal 8), que é o guia de estilo para código Python.
 
 Use o comando abaixo para executar o pylint, substituindo ``file_name`` pelo nome do arquivo que será avaliado.
 ```
@@ -114,5 +114,20 @@ Ao executar esse comando para os arquivos python presentes neste projeto, foi ob
 ![Resultados ao executar o pylint nos arquivos python do projeto 1](images/pylint.jpeg)
 
 ## Testes
+Caso queiramos incrementar a base de dados referente às avaliações e à lista de filmes para que ela permaneça atual, refatorar ou melhor uma função já existente, é muito importante a utilização de testes para mitigar os possíveis erros que podem acontecer nesse processo. 
+
+Assim, para que isso seja possível, será utilizada a biblioteca ``pytest``. Para executar os [testes implementados](https://github.com/AugustoOliveira099/mlops2023/blob/main/Python_Essentials_for_MLOps/Project_1/test_recommendation_system.py), basta rodar um dos seguintes comandos no terminal:
+* O pytest identifica automaticamente o arquivo pela conversão do nome começar com ``test_``
+```
+pytest
+```
+* Especificar qual é o arquivo contendo a implementação dos testes
+```
+pytest test_recommendation_system.py
+```
+
+Abaixo está a execução dos testes implementados:
+![Testes implementados executados](images/pytest.jpeg)
 
 ## Copyright ©
+O código aqui implementado foi adaptado de um projeto de portifólio do [Dataquest](https://www.dataquest.io/). Veja a [solução original](https://github.com/dataquestio/project-walkthroughs/blob/master/movie_recs/movie_recommendations.ipynb) e também uma [videoaula no YouTube](https://www.youtube.com/watch?v=eyEabQRBMQA&ab_channel=Dataquest) do passo a passo e da explicação de como foi feita a implementação original.
