@@ -4,6 +4,8 @@ Autor: José Augusto
 Data: 2023-10-09
 """
 
+import pandas as pd
+
 def test_clean_movie_title(load_clean_title: str) -> None:
     """
     Testa se o título retornado está limpo.
@@ -13,7 +15,7 @@ def test_clean_movie_title(load_clean_title: str) -> None:
     """
     assert load_clean_title == "Women of Devils Island 1962"
 
-def test_size_of_the_dataframes(load_dataframes) -> None:
+def test_size_of_the_dataframes(load_dataframes: list[pd.DataFrame, pd.DataFrame]) -> None:
     """
     Testa um tamanho mínumo dos dataframes, tendo-se em vista que já possuem um valor
     considerável e precisamos de uma quantidade mínima de dadaos para que o script
@@ -31,7 +33,7 @@ def test_size_of_the_dataframes(load_dataframes) -> None:
     assert movie_df.shape[1] == 3
     assert ratings_df.shape[1] == 4
 
-def test_columns_type_of_the_dataframes(load_dataframes) -> None:
+def test_columns_type_of_the_dataframes(load_dataframes: list[pd.DataFrame, pd.DataFrame]) -> None:
     """
     Testa o tipo das columns dos dataframes
 
