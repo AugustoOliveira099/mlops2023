@@ -7,7 +7,7 @@ Data: 2023-10-09
 # Importa bibliotecas
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 
-def test_create_database(create_database_fixture) -> None:
+def test_create_database(create_database_fixture: SQLExecuteQueryOperator) -> None:
     """
     Testa se o dado proveniente da fixture create_database_fixture
     é uma instância de SQLExecuteQueryOperator.
@@ -20,7 +20,7 @@ def test_create_database(create_database_fixture) -> None:
 
     assert isinstance(database, SQLExecuteQueryOperator)
 
-def test_get_episodes(get_episodes_fixture) -> None:
+def test_get_episodes(get_episodes_fixture: list) -> None:
     """
     Testa se o dado proveniente da fixture fetch_data_fixture é uma lista de
     tamanho 50.
