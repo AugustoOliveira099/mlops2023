@@ -187,8 +187,29 @@ best_estimator_accuracy *= 100
 logging.info("Model's accuracy on the test set: %.2f%%", best_estimator_accuracy)
 ```
 
-## Testes
-
 ## Boas práticas
+Boas práticas de programação são cruciais para que códigos legível e de fácil manuteção sejam escritos. Tendo-se isso em vista, foi utilizado o pylint para avaliar cada arquivo python e dar uma nota de 0 a 10 de acordo com a conformidade do código com Guia de Estilo Python (PEP 8).
+
+Para fazer uso dele, basta executar o comando a seguir substituindo python_file_name.py pelo nome do arquivo que será avaliado:
+```
+pylint python_file_name.py
+```
+
+Para os códigos desenvolvidso neste projeto, temos as seguintes avaliações:
+![Resposta do pylint para os scripts do projeto](images/pylint.jpeg)
+
+## Testes
+Para que seja possível mitigar ao máximo a presença de erros, é fundamental que existam testes voltados para verificar elementos cruciais do código. 
+
+Sempre que algo seja alterado, seja uma refatoração de cõdigo, uma melhoria ou um ajuste na base de dados, eles devem ser executados.
+
+Para isso, neste projeto, basta estar no diretório ``Projeto_3`` e executar o comando abaixo:
+```
+pytest
+```
+
+Para este projeto, a saída do comando acima foi:
+![Execução dos testes unitários](images/pytest.jpeg)
 
 ## Copyrights ©
+Este projeto é uma adaptação das instruções dados pelo [Dataquest](https://www.dataquest.io/) no [guia de projeto ``Predicting Heart Disease``](https://app.dataquest.io/c/134/m/740/guided-project%3A-predicting-heart-disease/8/hyperparameter-tuning?path=23&slug=machine-learning-in-python-skill&version=1).
