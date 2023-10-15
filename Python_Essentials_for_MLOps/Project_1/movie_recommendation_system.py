@@ -33,10 +33,10 @@ if __name__ == '__main__':
     parser.add_argument("-t", "--title", type=str, help="The title of the movie")
     args = parser.parse_args()
 
-    # get the movie title
+    # Obtém o título do filme
     movie_title = args.title
 
-    # read the data
+    # Lê os dados
     try:
         if not os.path.exists(DIRECTORY_NAME):
             logging.info("Downloading the zip file")
