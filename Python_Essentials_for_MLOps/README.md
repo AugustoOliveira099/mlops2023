@@ -53,4 +53,4 @@ O professor pediu que algumas práticas e tecnologias fossem utilizadas no proje
 
 ## Links
 * [Certificado do curso do Dataquest](https://app.dataquest.io/view_cert/OVQ502HZ2I2Y8NVCE7R2)
-* [Vídeo de explicação no Loom]()
+* [Vídeo de explicação no Loom](https://www.loom.com/share/5851b4a85d69427a992c66dacd3571a0)
