@@ -46,7 +46,7 @@ O professor pediu que algumas práticas e tecnologias fossem utilizadas no proje
 * GitHub codespaces: É um ambiente de desenvolvimento configurável hospedado no GitHub. Ele permite que os desenvolvedores acessem e desenvolvam seus projetos diretamente no navegador, fornecendo um ambiente completo para codificação, testes e depuração.
 
 ## Referências
-* [Repositório do professor Dr. Ivanovitch Silva](https://github.com/ivanovitchm/mlops
+* [Repositório do professor Dr. Ivanovitch Silva](https://github.com/ivanovitchm/mlops)
 * [Build a Movie Recommendation System in Python](https://app.dataquest.io/c/93/m/99994/build-a-movie-recommendation-system-in-python/13/next-steps)
 * [Build an Airflow Data Pipeline to Download Podcasts](https://app.dataquest.io/c/93/m/999911/build-an-airflow-data-pipeline-to-download-podcasts/6/conclusions-and-next-steps)
 * [Guided Project: Predicting Heart Disease](https://app.dataquest.io/c/134/m/740/guided-project%3A-predicting-heart-disease/8/hyperparameter-tuning?path=23&slug=machine-learning-in-python-skill&version=1)
