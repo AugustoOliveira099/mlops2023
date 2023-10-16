@@ -110,7 +110,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, r
 # Define as 5 melhores features para se observar
 top_5_features = ["Sex_M", "Oldpeak", "ExerciseAngina_Y", "ST_Slope_Flat", "ST_Slope_Up"]
 
-# Treina o modelo para cada uma das 5 melhores features separadamente
+# Ajusta o modelo para cada uma das 5 melhores features separadamente
 for feature in top_5_features:
     # Transforma a Série em uma matriz bidimensional
     X_train_feature = X_train[feature].values.reshape(-1, 1)
