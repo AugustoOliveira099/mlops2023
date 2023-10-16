@@ -1,0 +1,14 @@
+tqdm==4.64.0
+pandas==2.1.1
+pytest==7.4.2
+pylint==3.0.0
+numpy>=1.22.4
+requests>=2.31
+argparse==1.4.0
+scikit-learn==1.0.2
+pytest-sugar==0.9.7
+apache-airflow[pandas]
+xmltodict==0.13.0
+pendulum==2.1.2
+seaborn==0.13.0
+matplotlib==3.8.0
