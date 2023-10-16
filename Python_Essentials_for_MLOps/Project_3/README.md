@@ -10,10 +10,10 @@ pip install -r requirements.txt
 
 Para que você consiga usar o código, abra seu terminal na pasta ``Projeto_3`` e execute um dos comandos a seguir, substituindo o número pela proporção desejada de dados que serão destinados para testar o modelo obtido a partir dos dados de treinamento (resto dos dados que não serão destinados para teste).
 ```
-python heart_disease_prediction.py -ts 0.15
+python heart_desease_prediction.py -ts 0.15
 ```
 ```
-python heart_disease_prediction.py --test_size 0.15
+python heart_desease_prediction.py --test_size 0.15
 ```
 
 ## Explicando o código
