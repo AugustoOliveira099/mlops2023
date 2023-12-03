@@ -2,13 +2,13 @@
 Para que comecemos a desenvolver códigos de machine learning, algumas práticas práticas e tecnologias são essenciais. São elas: refatoração de código, principíos de código limpo, linting, lidar com exceções, logging, testes unitários e interface de linha de comando. Aqui estão desenvolvidos três projetos, que tiveram a finalidade de colocar em uso essas práticas.
 
 ### Projeto 1
-O [projeto 1](Projeto_1/) faz uso de mineração de texto  partir de um título de filme passado como parâmetro, com o auxílio da biblioteca ``scikit-learn`` para isso. Compara avaliações de filmes de pessoas com o gosto parecido com o do usuçario que informou o título do filme e com avaliações de pessoas no geral para que sejam indicados, então, que o usuãrio do script poderá gostar.
+O [projeto 1](Project_1/) faz uso de mineração de texto  partir de um título de filme passado como parâmetro, com o auxílio da biblioteca ``scikit-learn`` para isso. Compara avaliações de filmes de pessoas com o gosto parecido com o do usuçario que informou o título do filme e com avaliações de pessoas no geral para que sejam indicados, então, que o usuãrio do script poderá gostar.
 
 ### Projeto 2
-[Neste projeto](Projeto_1/) é utilizado o [Apache Airflow](https://airflow.apache.org/) para fazer uma pipeline que é executada diariamente e faz download de novos episódios de podcast.
+[Neste projeto](Project_2/) é utilizado o [Apache Airflow](https://airflow.apache.org/) para fazer uma pipeline que é executada diariamente e faz download de novos episódios de podcast.
 
 ### Projeto 3
-No [projeto 3](Projeto_1/) é introduzido machine learning com o algoritmo k-NN(k-Nearest Neighbors). Nele, ao executar o script, é possível prever, com uma certa acurácia, se uma pessoa tem doenças cardíacas.
+No [projeto 3](Project_3/) é introduzido machine learning com o algoritmo k-NN(k-Nearest Neighbors). Nele, ao executar o script, é possível prever, com uma certa acurácia, se uma pessoa tem doenças cardíacas.
 
 ## Requisitos e tecnologias
 * Python 3.10.x
