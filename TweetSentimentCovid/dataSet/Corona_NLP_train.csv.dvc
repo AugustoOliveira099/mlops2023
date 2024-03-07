@@ -1,0 +1,5 @@
+outs:
+- md5: 7f92d4c2665c599285fe209b89213531
+  size: 10500262
+  hash: md5
+  path: Corona_NLP_train.csv

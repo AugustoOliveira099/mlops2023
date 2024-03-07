@@ -1,0 +1,5 @@
+outs:
+- md5: a6cbe36189f78ffe706ae08b10b82fa8
+  size: 1002494
+  hash: md5
+  path: Corona_NLP_test.csv
